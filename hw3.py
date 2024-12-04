@@ -195,3 +195,33 @@ def to_xml(constants, parsed_data):
     formatted_xml = xml.dom.minidom.parseString(xml_str).toprettyxml(indent="  ")  # Форматируем с отступами
     
     return formatted_xml
+
+if __name__ == "__main__":  # Проверяем, что скрипт запускается напрямую
+    # Аргументы командной строки
+    parser = argparse.ArgumentParser(description="CLI для трансляции конфигураций в XML")  
+    parser.add_argument("--input", required=True, help="Путь к входному файлу")  # Определяем обязательный аргумент для входного файла
+    parser.add_argument("--output", required=True, help="Путь к выходному файлу")  # Определяем обязательный аргумент для выходного файла
+    args = parser.parse_args()  # Парсим аргументы командной строки
+    
+    try:  
+        # Шаг 1. Чтение файла
+        with open(args.input, 'r') as f:  
+            raw_text = f.read()  # Читаем содержимое файла
+        # Шаг 2. Убираем комментарии
+        cleaned_text = remove_comments(raw_text)  
+        
+        # Шаг 3. Парсим константы
+        constants, remaining_text = parse_constants(cleaned_text)
+
+        # Шаг 4. Парсим словари
+        parsed_data = parse_dict(remaining_text, constants)
+        
+        # Шаг 5. Преобразуем данные в XML
+        xml_output = to_xml(constants, parsed_data)  # Объединяем константы и распарсенные данные в XML 
+        
+        # Записываем XML в выходной файл
+        with open(args.output, 'w') as f:  
+            f.write(xml_output)  # Записываем XML в файл
+    except Exception as e:  # Обработка исключений
+        print(f"Ошибка: {e}", file=sys.stderr)  # Выводим сообщение об ошибке в стандартный поток ошибок
+        sys.exit(1)  # Завершаем программу с кодом ошибки 1

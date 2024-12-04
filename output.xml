@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<root>
+  <configuration>
+    <a>3</a>
+    <b>6</b>
+    <r>5</r>
+    <m>18</m>
+    <k>2.0</k>
+    <l>3</l>
+    <p>9</p>
+  </configuration>
+  <dictionary>
+    <item name="c">10</item>
+    <item name="d">20</item>
+  </dictionary>
+</root>
