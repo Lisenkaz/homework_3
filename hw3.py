@@ -152,3 +152,24 @@ def parse_dict(text, constants):
             raise ValueError(f"Неизвестное значение: {value}")
 
     return result  # Возвращаем собранный словарь
+
+def parse_key_value(item, constants):    
+    # Разделяем элемент по '=>' на ключ и значение
+    key_value = item.split('=>', 1)  
+    if len(key_value) != 2:  # Проверяем, что мы получили ровно две части
+        raise ValueError(f"Неверный формат элемента: {item}")  # Если нет, выбрасываем ошибку
+    
+    key = key_value[0].strip()  # Извлекаем и обрезаем ключ
+    value = key_value[1].strip()  # Извлекаем и обрезаем значение
+    
+    # Преобразуем значение
+    if value.isdigit():  # Если значение является числом
+        value = int(value)  # Преобразуем его в целое число
+    elif value in constants:  # Если значение является константой
+        value = constants[value]  # Заменяем его на соответствующее значение константы
+    elif value.startswith('table(') and value.endswith(')'):  # Если значение - это словарь
+        value = parse_dict(value, constants)  # Парсим словарь
+    else:  # В противном случае считаем значение строкой
+        value = value.strip('"')  # Убираем кавычки вокруг строки, если они есть
+    
+    return key, value  # Возвращаем ключ и обработанное значение
