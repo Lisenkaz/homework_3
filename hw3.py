@@ -56,4 +56,11 @@ def evaluate_prefix(expression, constants):
     
     return stack[0]  # Возвращаем результат вычисления
 
-
+# Функция для удаления комментариев
+def remove_comments(text):   
+    # Удаляем однострочные комментарии, начинающиеся с "::"
+    text = re.sub(r'::.*', '', text)  
+    # Удаляем многострочные комментарии, заключенные в фигурные скобки {}
+    text = re.sub(r'\{.*?\}', '', text, flags=re.DOTALL)  
+    # Возвращаем текст без пробелов в начале и в конце
+    return text.strip()  
