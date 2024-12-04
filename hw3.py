@@ -173,3 +173,25 @@ def parse_key_value(item, constants):
         value = value.strip('"')  # Убираем кавычки вокруг строки, если они есть
     
     return key, value  # Возвращаем ключ и обработанное значение
+
+#Функция для преобразования данных в XML.
+def to_xml(constants, parsed_data):    
+    root = ET.Element("root")  # Создаем общий корневой элемент
+    
+    # Создаем элемент для конфигурации
+    config_element = ET.SubElement(root, "configuration")  
+    for key, value in constants.items():  # Проходим по каждому ключу и значению в данных
+        item = ET.SubElement(config_element, key.replace('+', 'plus').replace('*', 'multiply').replace('/', 'div').replace('-', 'subtract'))  # Заменяем символы на более удобные
+        item.text = str(value)  # Устанавливаем текст элемента как строку значения
+
+    # Создаем элемент для словаря
+    dictionary_element = ET.SubElement(root, "dictionary")
+    for key, value in parsed_data.items():
+        item = ET.SubElement(dictionary_element, "item", name=key)  # Создаем элемент с атрибутом name
+        item.text = str(value)  # Устанавливаем текст элемента как строку значения
+
+    # Преобразуем дерево в строку XML и форматируем
+    xml_str = ET.tostring(root, encoding='utf-8').decode('utf-8')
+    formatted_xml = xml.dom.minidom.parseString(xml_str).toprettyxml(indent="  ")  # Форматируем с отступами
+    
+    return formatted_xml
