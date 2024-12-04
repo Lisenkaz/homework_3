@@ -64,3 +64,38 @@ def remove_comments(text):
     text = re.sub(r'\{.*?\}', '', text, flags=re.DOTALL)  
     # Возвращаем текст без пробелов в начале и в конце
     return text.strip()  
+
+# Функция для парсинга объявления константы
+def parse_constants(text):   
+    constants = {}  # Словарь для хранения найденных констант
+    remaining_lines = []  # Список для хранения строк, не являющихся константами
+    
+    # Проходим по каждой строке входного текста
+    for line in text.splitlines():
+        line = line.strip()  # Убираем лишние пробелы в начале и конце строки
+        
+        # Проверяем, начинается ли строка с объявления константы
+        if '=' in line and "=>" not in line:
+            name, expression = line.split('=', 1)  # Разделяем на имя и выражение
+            name = name.strip()  # Убираем лишние пробелы
+            expression = expression.strip()  # Убираем лишние пробелы
+            
+            # Проверяем, является ли выражение префиксным
+            if expression.startswith('[') and expression.endswith(']'):
+                try:
+                    # Вычисляем значение префиксного выражения
+                    value = evaluate_prefix(expression, constants)
+                    constants[name] = value  # Сохраняем результат в словарь констант
+                except ValueError as e:
+                    raise ValueError(f"Ошибка при вычислении выражения '{expression}': {e}")
+            else:
+                # Проверяем, является ли значением числом
+                match = re.match(r"(\d+)", expression)
+                if match:
+                    constants[name] = int(match.group(1))  # Сохраняем константу в словарь, преобразуя значение в целое число
+                else:
+                    raise ValueError(f"Неверный формат константы: {line}")
+        else:
+            remaining_lines.append(line)  # Если строка не является константой, добавляем ее в список оставшихся строк
+            
+    return constants, "\n".join(remaining_lines)  # Возвращаем словарь констант и оставшийся текст в виде строки
