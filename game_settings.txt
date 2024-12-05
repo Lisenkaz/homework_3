@@ -1,0 +1,7 @@
+:: Настройки игры
+player_name = "Player"
+table(
+ car_colour => "yellow",
+ max_speed => 210,
+ fuel_tank_capacity => 50
+)

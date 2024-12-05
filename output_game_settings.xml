@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<root>
+  <configuration>
+    <player_name>Player</player_name>
+  </configuration>
+  <dictionary>
+    <item name="car_colour">yellow</item>
+    <item name="max_speed">210</item>
+    <item name="fuel_tank_capacity">50</item>
+  </dictionary>
+</root>

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<root>
+  <configuration>
+    <app_name>MyApp</app_name>
+    <app_version>1.0</app_version>
+  </configuration>
+  <dictionary>
+    <item name="language">ru</item>
+    <item name="max_users">100</item>
+  </dictionary>
+</root>

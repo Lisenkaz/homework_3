@@ -66,13 +66,13 @@ def remove_comments(text):
     return text.strip()  
 
 # Функция для парсинга объявления константы
-def parse_constants(text):   
+def parse_constants(text):       
     constants = {}  # Словарь для хранения найденных констант
-    remaining_lines = []  # Список для хранения строк, не являющихся константами
+    remaining_lines = []  # Список для хранения строк, не являющихся константами    
     
     # Проходим по каждой строке входного текста
     for line in text.splitlines():
-        line = line.strip()  # Убираем лишние пробелы в начале и конце строки
+        line = line.strip()  # Убираем лишние пробелы в начале и конце строки        
         
         # Проверяем, начинается ли строка с объявления константы
         if '=' in line and "=>" not in line:
@@ -82,35 +82,38 @@ def parse_constants(text):
             
             # Проверяем, является ли выражение префиксным
             if expression.startswith('[') and expression.endswith(']'):
-                try:
+                try:                    
                     # Вычисляем значение префиксного выражения
-                    value = evaluate_prefix(expression, constants)
+                    value = evaluate_prefix(expression, constants)                    
                     constants[name] = value  # Сохраняем результат в словарь констант
                 except ValueError as e:
                     raise ValueError(f"Ошибка при вычислении выражения '{expression}': {e}")
             else:
-                # Проверяем, является ли значением числом
-                match = re.match(r"(\d+)", expression)
-                if match:
-                    constants[name] = int(match.group(1))  # Сохраняем константу в словарь, преобразуя значение в целое число
+                # Проверяем, является ли значением числом или строкой
+                if expression.startswith('"') and expression.endswith('"'):
+                    constants[name] = expression[1:-1]  # Убираем кавычки для строк
                 else:
-                    raise ValueError(f"Неверный формат константы: {line}")
+                    match = re.match(r"(\d+)", expression)  # Проверяем, является ли значением числом
+                    if match:
+                        constants[name] = int(match.group(1))  # Сохраняем константу в словарь, преобразуя значение в целое число
+                    else:
+                        raise ValueError(f"Неверный формат константы: {line}")
         else:
-            remaining_lines.append(line)  # Если строка не является константой, добавляем ее в список оставшихся строк
-            
+            remaining_lines.append(line)  # Если строка не является константой, добавляем ее в список оставшихся строк            
+    
     return constants, "\n".join(remaining_lines)  # Возвращаем словарь констант и оставшийся текст в виде строки
 
 # Функция для парсинга словаря
 def parse_dict(text, constants):
     if not text.startswith('table(') or not text.endswith(')'):
         raise ValueError("Неверный формат словаря: должен начинаться с 'table(' и заканчиваться ')'")
-    
+
     # Убираем 'table(' и ')' и лишние пробелы
     text = text[6:-1].strip()  
-    result = {}  # Словарь для хранения пар ключ-значение
+    result = {}  # Словарь для хранения пар ключ-значение    
     buffer = ""  # Буфер для хранения текущей пары ключ-значение
-    
     depth = 0  # Переменная для отслеживания вложенности
+
     for char in text:
         if char == ',' and depth == 0:  # Если встречаем запятую и глубина вложенности равна нулю
             if buffer.strip():  # Если буфер не пустой
@@ -119,22 +122,24 @@ def parse_dict(text, constants):
                     raise ValueError(f"Неверный формат пары: {buffer}")
                 key = key_value[0].strip()  # Извлекаем и обрезаем ключ
                 value = key_value[1].strip()  # Извлекаем и обрезаем значение
-                
+
                 # Обработка значения
-                if value.isdigit():
-                    result[key] = int(value)  # Если значение - число, добавляем как целое
-                elif value in constants:
-                    result[key] = constants[value]  # Если значение - константа, добавляем ее значение
+                if value.isdigit():  # Если значение - число
+                    result[key] = int(value)  # Добавляем как целое
+                elif value.startswith('"') and value.endswith('"'):  # Если значение - строка
+                    result[key] = value[1:-1]  # Убираем кавычки
+                elif value in constants:  # Если значение - константа
+                    result[key] = constants[value]  # Добавляем ее значение
                 else:
                     raise ValueError(f"Неизвестное значение: {value}")
-                
+
                 buffer = ""  # Очищаем буфер
         else:
             buffer += char  # Добавляем символ в буфер
-            if char == '{':
-                depth += 1  # Увеличиваем глубину при встрече открывающей скобки
-            elif char == '}':
-                depth -= 1  # Уменьшаем глубину при встрече закрывающей скобки
+            if char == '{':  # Увеличиваем глубину при встрече открывающей скобки
+                depth += 1
+            elif char == '}':  # Уменьшаем глубину при встрече закрывающей скобки
+                depth -= 1
 
     # Обрабатываем последний элемент
     if buffer.strip():
@@ -143,9 +148,11 @@ def parse_dict(text, constants):
             raise ValueError(f"Неверный формат пары: {buffer}")
         key = key_value[0].strip()
         value = key_value[1].strip()
-        
+
         if value.isdigit():
             result[key] = int(value)
+        elif value.startswith('"') and value.endswith('"'):
+            result[key] = value[1:-1]  # Убираем кавычки
         elif value in constants:
             result[key] = constants[value]
         else:

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<root>
+  <configuration>
+    <server_port>8080</server_port>
+    <server_name>MyServer</server_name>
+  </configuration>
+  <dictionary>
+    <item name="user">admin</item>
+    <item name="password">secret</item>
+  </dictionary>
+</root>

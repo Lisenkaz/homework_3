@@ -1,0 +1,7 @@
+::Настройки сервера
+server_port = 8080
+server_name = "MyServer"
+table(
+ user => "admin",
+ password => "secret"
+)

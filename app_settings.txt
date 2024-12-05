@@ -1,0 +1,7 @@
+:: Настройки приложения
+app_name = "MyApp"
+app_version = "1.0"
+table(
+ language => "ru",
+ max_users => 100
+)
